@@ -23,8 +23,10 @@ int main() {
     struct sockaddr_in addr = {
         .sin_len = sizeof(struct sockaddr_in),
         .sin_family = AF_INET,
-        .sin_addr.s_addr = INADDR_ANY,
         .sin_port = htons(PORT),
+        .sin_addr = {
+            .s_addr = INADDR_ANY,
+        },
     };
     TRY(bind(sockfd, (struct sockaddr *)&addr, addr.sin_len));
 
