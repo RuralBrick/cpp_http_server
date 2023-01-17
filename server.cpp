@@ -1,11 +1,10 @@
 #include <errno.h>
 #include <netinet/in.h>
-#include <sys/socket.h>
 #include <stdio.h>
+#include <sys/socket.h>
 #include <unistd.h>
-
-#define PORT 15635
-#define BACKLOG 1
+#include "config.hpp"
+#include "request.hpp"
 
 #define TRY(x) if ((x) < 0) { perror(NULL); return errno; }
 
@@ -39,10 +38,9 @@ int main() {
     TRY(client_sockfd);
 
     /* Read from client and print the request to stdout */
-    unsigned char req[65536];
-    int nread = recv(client_sockfd, req, sizeof req, 0);
-    TRY(nread);
-    write(STDOUT_FILENO, req, nread);
+    Request req(client_sockfd);
+    TRY(req.buf_size);
+    write(STDOUT_FILENO, req.buf, req.buf_size);
 
     /* Send to client */
     char res[] = "hello, world";
