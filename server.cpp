@@ -27,7 +27,7 @@ int main() {
             .s_addr = INADDR_ANY,
         },
     };
-    TRY(bind(sockfd, (struct sockaddr *)&addr, sizeof(struct sockaddr_in)));
+    TRY(bind(sockfd, (struct sockaddr *)&addr, sizeof addr));
 
     /* Listen */
     TRY(listen(sockfd, BACKLOG));

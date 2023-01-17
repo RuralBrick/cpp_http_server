@@ -1,20 +1,23 @@
 CC=g++
-CFLAGS=-I.
-DEPS=
-OBJ=server.o
+CFLAGS:=$(CFLAGS) -I. -Wall
+SRC=$(wildcard *.cpp)
+DEPS=$(SRC:.cpp=.d)
+OBJ=$(SRC:.cpp=.o)
 USERID=123456789
-QUANID=
+QUANID=105490012
 THEOID=405462550
-
-%.o: %.cpp $(DEPS)
-	$(CC) -c -o $@ $< $(CFLAGS)
 
 all: server
 server: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS)
 
+%.o: %.cpp Makefile
+	$(CC) -c -o $@ $< $(CFLAGS) -MMD -MP
+
+-include $(DEPS)
+
 clean:
-	rm -rf *.o server *.tar.gz
+	rm -rf *.o *.d server *.tar.gz
 
 dist: tarball
 tarball: clean
