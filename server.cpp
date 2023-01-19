@@ -43,6 +43,12 @@ int main() {
     write(STDOUT_FILENO, req.buf, req.buf_size);
 
     /* Send to client */
+    // TODO: Send proper response
+
+    // HTTP/1.1 200 OK\r\n
+    // content-type: text/html\r\n
+    // \r\n
+    // <text data>
     char res[] = "hello, world";
     TRY(send(client_sockfd, res, sizeof res - 1, 0)); /* minus 1 bc of the \0 */
 

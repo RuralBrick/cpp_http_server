@@ -1,4 +1,6 @@
 .vscode/
+binaryfile
+downloadfile
 
 # Prerequisites
 *.d
