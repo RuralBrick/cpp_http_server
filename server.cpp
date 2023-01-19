@@ -1,10 +1,13 @@
+#include <cstdint>
 #include <errno.h>
 #include <netinet/in.h>
 #include <stdio.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <vector>
 #include "config.hpp"
 #include "request.hpp"
+#include "response.hpp"
 
 #define TRY(x) if ((x) < 0) { perror(NULL); return errno; }
 
@@ -43,14 +46,8 @@ int main() {
     write(STDOUT_FILENO, req.buf, req.buf_size);
 
     /* Send to client */
-    // TODO: Send proper response
-
-    // HTTP/1.1 200 OK\r\n
-    // content-type: text/html\r\n
-    // \r\n
-    // <text data>
-    char res[] = "hello, world";
-    TRY(send(client_sockfd, res, sizeof res - 1, 0)); /* minus 1 bc of the \0 */
+    std::vector<uint8_t> res = response::generate(&req);
+    TRY(send(client_sockfd, res.data(), res.size(), 0));
 
     /* End connection */
     // TODO: Don't shutdown after just one request
