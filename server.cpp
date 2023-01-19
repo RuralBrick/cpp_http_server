@@ -53,6 +53,7 @@ int main() {
     TRY(send(client_sockfd, res, sizeof res - 1, 0)); /* minus 1 bc of the \0 */
 
     /* End connection */
+    // TODO: Don't shutdown after just one request
     TRY(shutdown(client_sockfd, SHUT_RDWR));
     TRY(close(client_sockfd));
 
