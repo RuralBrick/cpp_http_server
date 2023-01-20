@@ -13,17 +13,17 @@ namespace response {
     }
 
     static std::string parse_filetype(std::string filename) {
-        # TODO
+        // TODO
         return "";
     }
 
     static std::string create_status_line() {
-        # FIXME
+        // FIXME
         return "HTTP/1.1 200 yabbadabbadoo";
     }
 
     static std::string create_headers(std::string filetype) {
-        # TODO
+        // TODO
         return "";
     }
 
@@ -31,7 +31,7 @@ namespace response {
         std::vector<uint8_t> content;
 
         if (filename == "test.html") {
-            # TODO
+            // TODO
         }
         else {
             std::string msg = "hello, world";
