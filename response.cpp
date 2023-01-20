@@ -1,6 +1,7 @@
 #include <cstdint>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -9,12 +10,32 @@
 
 namespace response {
     static std::string parse_filename(std::string url) {
-        return url.substr(1);
+        // Remove "/"
+        std::string filename = url.substr(1);
+
+        // Replace percent-encoded spaces
+        size_t pos;
+        while ((pos = filename.find("%20")) != std::string::npos) {
+            filename.replace(pos, 3, " ");
+        }
+
+        // Replace percent-encoded percent signs
+        while ((pos = filename.find("%25", pos + 1)) != std::string::npos) {
+            filename.replace(pos, 3, "%");
+        }
+
+        return filename;
     }
 
     static std::string parse_filetype(std::string filename) {
-        // TODO
-        return "";
+        size_t period_pos = filename.find_last_of('.');
+
+        if (period_pos != std::string::npos) {
+            return filename.substr(period_pos + 1);
+        }
+        else {
+            return "";
+        }
     }
 
     static std::string create_status_line() {
@@ -22,20 +43,49 @@ namespace response {
         return "HTTP/1.1 200 yabbadabbadoo";
     }
 
+    static std::string get_content_type_header(std::string filetype) {
+        const std::map<std::string, std::string> content_type = {
+            { "",     "application/octet-stream" },
+            { "pdf",  "application/pdf" },
+            { "jpg",  "image/jpeg" },
+            { "jpeg", "image/jpeg" },
+            { "png",  "image/png" },
+            { "htm",  "text/html" },
+            { "html", "text/html" },
+            { "txt",  "text/plain" }
+        };
+
+        auto it = content_type.find(filetype);
+
+        if (it != content_type.end()) {
+            return "Content-Type: " + it->second + "\r\n";
+        } else {
+            return "";
+        }
+    }
+
     static std::string create_headers(std::string filetype) {
-        // TODO
-        return "";
+        std::string headers;
+        
+        headers.append(get_content_type_header(filetype));
+
+        return headers;
     }
 
     static std::vector<uint8_t> create_body(std::string filename) {
         std::vector<uint8_t> content;
 
+        // TODO: Search for `filename` and return any matches
         if (filename == "test.html") {
-            // TODO
+            std::ifstream ifs(filename);
+
+            while (ifs.good()) {
+                content.push_back(ifs.get());
+            }
         }
         else {
             std::string msg = "hello, world";
-            content.insert(content.end(), msg.begin(), msg.end());
+            content.assign(msg.begin(), msg.end());
         }
 
         return content;
