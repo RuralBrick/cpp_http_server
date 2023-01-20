@@ -46,6 +46,7 @@ int main() {
     write(STDOUT_FILENO, req.buf, req.buf_size);
 
     /* Send to client */
+    // FIXME: ./test_binary.sh currently failing
     std::vector<uint8_t> res = response::generate(&req);
     TRY(send(client_sockfd, res.data(), res.size(), 0));
 

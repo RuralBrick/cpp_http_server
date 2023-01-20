@@ -69,23 +69,18 @@ namespace response {
         
         headers.append(get_content_type_header(filetype));
 
+        // TODO: Maybe keep-alive or other headers that specify how long browser
+        // should hold connection
+
         return headers;
     }
 
     static std::vector<uint8_t> create_body(std::string filename) {
         std::vector<uint8_t> content;
+        std::ifstream ifs(filename);
 
-        // TODO: Search for `filename` and return any matches
-        if (filename == "test.html") {
-            std::ifstream ifs(filename);
-
-            while (ifs.good()) {
-                content.push_back(ifs.get());
-            }
-        }
-        else {
-            std::string msg = "hello, world";
-            content.assign(msg.begin(), msg.end());
+        while (ifs.good()) {
+            content.push_back(ifs.get());
         }
 
         return content;
@@ -102,13 +97,6 @@ namespace response {
 
         std::cout << req->version << "\n";
         std::cout << req->body << "\n";
-
-        // TODO: Send proper response
-
-        // HTTP/1.1 200 OK\r\n
-        // content-type: text/html\r\n
-        // \r\n
-        // <text data>
 
         std::string filename = parse_filename(req->url);
         std::string filetype = parse_filetype(filename);
