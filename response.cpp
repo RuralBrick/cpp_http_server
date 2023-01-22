@@ -3,10 +3,12 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <unistd.h>
 #include <vector>
 
 #include "response.hpp"
 #include "request.hpp"
+#include "config.hpp"
 
 namespace response {
     static std::string parse_filename(std::string url) {
@@ -38,9 +40,21 @@ namespace response {
         }
     }
 
-    static std::string create_status_line() {
-        // FIXME
-        return "HTTP/1.1 200 yabbadabbadoo";
+    static bool file_exists(std::string filename) {
+        std::ifstream ifs(filename);
+        return ifs.good();
+    }
+
+    static std::string create_status_line(int code) {
+        const std::map<int, std::string> status_phrases = {
+            { 200, "OK" },
+            { 400, "Bad Request" },
+            { 404, "Not Found" }
+        };
+
+        return "HTTP/1.1 "
+               + std::to_string(code) + " "
+               + status_phrases.at(code) + "\r\n";
     }
 
     static std::string get_content_type_header(std::string filetype) {
@@ -66,47 +80,79 @@ namespace response {
 
     static std::string create_headers(std::string filetype) {
         std::string headers;
-        
+
         headers.append(get_content_type_header(filetype));
 
-        // TODO: Maybe keep-alive or other headers that specify how long browser
-        // should hold connection
-
-        return headers;
+        return headers + "\r\n";
     }
 
     static std::vector<uint8_t> create_body(std::string filename) {
         std::vector<uint8_t> content;
         std::ifstream ifs(filename);
 
-        while (ifs.good()) {
-            content.push_back(ifs.get());
+        if (ifs.good()) {
+            content.assign((std::istreambuf_iterator<char>(ifs)),
+                           (std::istreambuf_iterator<char>()));
         }
 
         return content;
     }
 
+    static std::vector<uint8_t> build_200_response(
+        std::string filename, std::string filetype
+    ) {
+        std::string status = create_status_line(200);
+        std::string headers = create_headers(filetype);
+        std::vector<uint8_t> body = create_body(filename);
+        
+        std::vector<uint8_t> res(status.begin(), status.end());
+        res.insert(res.end(), headers.begin(), headers.end());
+        res.insert(res.end(), body.begin(), body.end());
+
+        return res;
+    }
+
+    static std::vector<uint8_t> build_400_response() {
+        std::string status = create_status_line(400);
+        std::string headers = create_headers("");
+        
+        std::vector<uint8_t> res(status.begin(), status.end());
+        res.insert(res.end(), headers.begin(), headers.end());
+
+        return res;
+    }
+
+    static std::vector<uint8_t> build_404_response() {
+        std::string status = create_status_line(404);
+        std::string headers = create_headers("");
+        
+        std::vector<uint8_t> res(status.begin(), status.end());
+        res.insert(res.end(), headers.begin(), headers.end());
+
+        return res;
+    }
+
     std::vector<uint8_t> generate(const Request* req) {
-        std::cout << req->buf_size << "\n";
-        std::cout << req->method << "\n";
-
-        std::cout << req->url << "\n";
-        /* %20 -> space
-        * %25 -> %
-        */
-
-        std::cout << req->version << "\n";
-        std::cout << req->body << "\n";
-
         std::string filename = parse_filename(req->url);
         std::string filetype = parse_filetype(filename);
 
-        std::string preamble = create_status_line() + "\r\n"
-                               + create_headers(filetype) + "\r\n";
-        std::vector<uint8_t> body = create_body(filename);
+        std::vector<uint8_t> res;
 
-        std::vector<uint8_t> res(preamble.begin(), preamble.end());
-        res.insert(res.end(), body.begin(), body.end());
+        if (req->method != std::string("GET")) {
+            res = build_400_response();
+        }
+        else if (filename == "") {
+            res = build_200_response("index.html", "html");
+        }
+        else if (!file_exists(filename)) {
+            res = build_404_response();
+        }
+        else {
+            res = build_200_response(filename, filetype);
+        }
+
+        write(STDOUT_FILENO, res.data(), res.size());
+
         return res;
     }
 }
