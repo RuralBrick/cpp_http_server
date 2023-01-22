@@ -160,7 +160,7 @@ namespace response {
             res = build_200_response(filename, filetype);
         }
 
-        write(STDOUT_FILENO, res.data(), res.size());
+        write(STDOUT_FILENO, res.data(), res.size()); // TODO: Maybe remove
 
         return res;
     }
