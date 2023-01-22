@@ -78,6 +78,15 @@ namespace response {
         }
     }
 
+    static std::string get_keep_alive_header() {
+        return "Keep-Alive: timeout=" + std::to_string(TIMEOUT) + ", "
+               + "max=" + std::to_string(MAX_REQUESTS) + "\r\n";
+    }
+
+    static std::string get_connection_header() {
+        return "Connection: Closed\r\n";
+    }
+
     static std::string create_headers(std::string filetype) {
         std::string headers;
 
