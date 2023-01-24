@@ -10,3 +10,7 @@
 
 // Response
 #define TIMEOUT 5
+
+// Macros
+#define DEBUG 0
+#define DEBUG_PRINT(x) if (DEBUG) x
