@@ -44,7 +44,6 @@ int main() {
         /* Read from client and print the request to stdout */
         Request req(client_sockfd);
         TRY(req.buf_size);
-        DEBUG_PRINT(write(STDOUT_FILENO, req.buf, req.buf_size));
 
         /* Send to client */
         std::vector<uint8_t> res = response::generate(&req);

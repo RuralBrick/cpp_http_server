@@ -1,6 +1,7 @@
 #include "request.hpp"
 
 #include <sys/socket.h>
+#include <unistd.h>
 #include <vector>
 
 static char *next_token(char *ptr, char separator) {
@@ -20,6 +21,7 @@ Request::Request(int sockfd) : buf{0} {
     if (buf_size < 0) {
         return;
     }
+    DEBUG_PRINT(write(STDOUT_FILENO, buf, buf_size));
 
     char *buf_p = buf;
 
