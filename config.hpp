@@ -1,6 +1,6 @@
 // Server
 #define PORT 15635
-#define BACKLOG 1
+#define BACKLOG 5
 
 #define MAX_CONNECTIONS 10
 #define MAX_REQUESTS 100

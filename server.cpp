@@ -34,25 +34,26 @@ int main() {
     /* Listen */
     TRY(listen(sockfd, BACKLOG));
 
-    /* Accept */
-    struct sockaddr_in client_addr; /* this struct is initialized by accept() */
-    socklen_t client_addr_len = sizeof client_addr;
-    int client_sockfd = accept(sockfd, (struct sockaddr *)&client_addr, &client_addr_len);
-    TRY(client_sockfd);
+    while (1) {
+        /* Accept */
+        struct sockaddr_in client_addr; /* this struct is initialized by accept() */
+        socklen_t client_addr_len = sizeof client_addr;
+        int client_sockfd = accept(sockfd, (struct sockaddr *)&client_addr, &client_addr_len);
+        TRY(client_sockfd);
 
-    /* Read from client and print the request to stdout */
-    Request req(client_sockfd);
-    TRY(req.buf_size);
-    write(STDOUT_FILENO, req.buf, req.buf_size); // TODO: Maybe remove
+        /* Read from client and print the request to stdout */
+        Request req(client_sockfd);
+        TRY(req.buf_size);
+        write(STDOUT_FILENO, req.buf, req.buf_size); // TODO: Maybe remove
 
-    /* Send to client */
-    std::vector<uint8_t> res = response::generate(&req);
-    TRY(send(client_sockfd, res.data(), res.size(), 0));
+        /* Send to client */
+        std::vector<uint8_t> res = response::generate(&req);
+        TRY(send(client_sockfd, res.data(), res.size(), 0));
 
-    /* End connection */
-    // TODO: Don't shutdown after just one request
-    TRY(shutdown(client_sockfd, SHUT_RDWR));
-    TRY(close(client_sockfd));
+        /* End connection */
+        TRY(shutdown(client_sockfd, SHUT_RDWR));
+        TRY(close(client_sockfd));
+    }
 
     return 0;
 }
