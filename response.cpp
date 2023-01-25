@@ -39,12 +39,7 @@ namespace response {
             return "";
         }
     }
-
-    static bool file_exists(std::string filename) {
-        std::ifstream ifs(filename);
-        return ifs.good();
-    }
-
+ 
     static std::string create_status_line(int code) {
         const std::map<int, std::string> status_phrases = {
             { 200, "OK" },
@@ -78,15 +73,6 @@ namespace response {
         }
     }
 
-    static std::string get_keep_alive_header() {
-        return "Keep-Alive: timeout=" + std::to_string(TIMEOUT) + ", "
-               + "max=" + std::to_string(MAX_REQUESTS) + "\r\n";
-    }
-
-    static std::string get_connection_header() {
-        return "Connection: Closed\r\n";
-    }
-
     static std::string create_headers(std::string filetype) {
         std::string headers;
 
@@ -117,26 +103,6 @@ namespace response {
         std::vector<uint8_t> res(status.begin(), status.end());
         res.insert(res.end(), headers.begin(), headers.end());
         res.insert(res.end(), body.begin(), body.end());
-
-        return res;
-    }
-
-    static std::vector<uint8_t> build_400_response() {
-        std::string status = create_status_line(400);
-        std::string headers = create_headers("");
-        
-        std::vector<uint8_t> res(status.begin(), status.end());
-        res.insert(res.end(), headers.begin(), headers.end());
-
-        return res;
-    }
-
-    static std::vector<uint8_t> build_404_response() {
-        std::string status = create_status_line(404);
-        std::string headers = create_headers("");
-        
-        std::vector<uint8_t> res(status.begin(), status.end());
-        res.insert(res.end(), headers.begin(), headers.end());
 
         return res;
     }
