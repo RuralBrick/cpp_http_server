@@ -153,9 +153,9 @@ namespace response {
         else if (filename == "") {
             res = build_200_response("index.html", "html");
         }
-        else if (!file_exists(filename)) {
-            res = build_404_response();
-        }
+        // else if (!file_exists(filename)) {
+        //     res = build_404_response();
+        // }
         else {
             res = build_200_response(filename, filetype);
         }
