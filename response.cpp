@@ -147,14 +147,8 @@ namespace response {
 
         std::vector<uint8_t> res;
 
-        if (req->method != std::string("GET")) {
-            res = build_400_response();
-        }
-        else if (filename == "") {
+        if (filename == "") {
             res = build_200_response("index.html", "html");
-        }
-        else if (!file_exists(filename)) {
-            res = build_404_response();
         }
         else {
             res = build_200_response(filename, filetype);
