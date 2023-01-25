@@ -147,7 +147,7 @@ namespace response {
 
         std::vector<uint8_t> res;
 
-        if (req->method != std::string("GET")) {
+        if (0/*req->method != std::string("GET")*/) {
             res = build_400_response();
         }
         else if (filename == "") {
