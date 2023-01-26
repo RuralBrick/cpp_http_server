@@ -1,6 +1,7 @@
 .vscode/
 binaryfile
 downloadfile
+*.tar.gz
 
 # Prerequisites
 *.d
